@@ -1,0 +1,274 @@
+#include <iostream>  // Include the input-output stream
+using namespace std;
+
+// Class definition for Binary Search Tree
+class BST {
+public:
+    // Nested Node structure
+    struct Node {
+        int data;         // Data of the node
+        Node* left;       // Pointer to left child
+        Node* right;      // Pointer to right child
+        Node(int val);    // Constructor declaration
+    };
+    
+    Node* root;           // Root of the BST
+
+    BST();                // Constructor declaration
+    Node* insert(Node* root, int val);     // Insert a node into BST
+    Node* findMin(Node* root);             // Find the node with minimum value
+    bool search(Node* root, int key);      // Search a value in BST
+    int height(Node* root);                // Get height of BST
+    void swapNodes(Node* root);            // Swap left and right child of all nodes
+    void inorder(Node* root);              // Inorder traversal
+    void menu();                           // Menu-driven interface
+};
+
+// Constructor for Node
+BST::Node::Node(int val) {
+    data = val;             // Assign value
+    left = right = NULL;    // Initialize left and right child to NULL
+}
+
+// Constructor for BST
+BST::BST() {
+    root = NULL;            // Initialize root to NULL
+}
+
+// Insert a value into BST
+BST::Node* BST::insert(Node* root, int val) {
+    if (root == NULL)                      // If tree/subtree is empty
+        return new Node(val);             // Create a new node
+
+    if (val < root->data)                 // If value is smaller, insert into left subtree
+        root->left = insert(root->left, val);
+    else                                  // Else insert into right subtree
+        root->right = insert(root->right, val);
+
+    return root;                          // Return current root
+}
+
+// Find node with minimum value in BST
+BST::Node* BST::findMin(Node* root) {
+    while (root->left != NULL)            // Traverse left until NULL
+        root = root->left;
+    return root;                          // Return leftmost (minimum) node
+}
+
+// Search for a value in BST
+bool BST::search(Node* root, int key) {
+    if (root == NULL)                     // Base case: not found
+        return false;
+    if (root->data == key)                // If current node matches
+        return true;
+    if (key < root->data)                 // If key is smaller, search left subtree
+        return search(root->left, key);
+    return search(root->right, key);      // Else search right subtree
+}
+
+// Calculate height of BST
+int BST::height(Node* root) {
+    if (root == NULL)                     // Base case: empty tree
+        return 0;
+    int leftHeight = height(root->left);     // Height of left subtree
+    int rightHeight = height(root->right);   // Height of right subtree
+    return max(leftHeight, rightHeight) + 1; // Height = max(L, R) + 1
+}
+
+// Swap left and right children of all nodes
+void BST::swapNodes(Node* root) {
+    if (root == NULL) return;             // Base case
+
+    swap(root->left, root->right);        // Swap left and right children
+    swapNodes(root->left);                // Recursively swap left subtree
+    swapNodes(root->right);               // Recursively swap right subtree
+}
+
+// Inorder traversal (Left -> Root -> Right)
+void BST::inorder(Node* root) {
+    if (root != NULL) {
+        inorder(root->left);              // Visit left subtree
+        cout << root->data << " ";        // Print current node
+        inorder(root->right);             // Visit right subtree
+    }
+}
+
+// Menu-driven interface for user interaction
+void BST::menu() {
+    int choice, val;
+    do {
+        // Display menu options
+        cout << "\nBinary Search Tree Operations:\n";
+        cout << "1. Insert Node\n";
+        cout << "2. Display Inorder Traversal\n";
+        cout << "3. Find Minimum Value\n";
+        cout << "4. Search for a Value\n";
+        cout << "5. Find Height of BST\n";
+        cout << "6. Swap Nodes\n";
+        cout << "7. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                // Insert a node
+                cout << "Enter value to insert: ";
+                cin >> val;
+                root = insert(root, val);      // Update root after insertion
+                break;
+
+            case 2:
+                // Display tree in inorder
+                cout << "Inorder Traversal: ";
+                inorder(root);
+                cout << endl;
+                break;
+
+            case 3:
+                // Find minimum value in BST
+                cout << "Minimum value in BST: " << findMin(root)->data << endl;
+                break;
+
+            case 4:
+                // Search a value in BST
+                cout << "Enter value to search: ";
+                cin >> val;
+                cout << (search(root, val) ? "Found" : "Not Found") << endl;
+                break;
+
+            case 5:
+                // Find height of BST
+                cout << "Height of BST: " << height(root) << endl;
+                break;
+
+            case 6:
+                // Swap nodes and show inorder after swap
+                swapNodes(root);
+                cout << "Nodes swapped. Inorder Traversal: ";
+                inorder(root);
+                cout << endl;
+                break;
+
+            case 7:
+                // Exit the loop/program
+                cout << "Exiting...\n";
+                break;
+
+            default:
+                // Handle invalid inputs
+                cout << "Invalid choice!\n";
+        }
+    } while (choice != 7); // Repeat until user chooses to exit
+}
+
+// Main function
+int main() {
+    BST tree;      // Create BST object
+    tree.menu();   // Launch menu
+    return 0;
+}
+ cd path/to/your/file
+g++ filename.cpp -o outputname
+./outputname
+g++ hello.cpp -o hello
+./hello
+sudo apt update
+sudo apt install g++
+/////////////////
+ Overview
+This code defines a class BST which implements a Binary Search Tree with basic operations like insertion, searching, finding minimum, calculating height, swapping left-right children, and displaying inorder traversal. It also includes a menu-driven interface for interaction.
+
+ Class and Struct Definitions
+Class BST: Encapsulates all BST operations.
+
+Nested Struct Node:
+
+Contains:
+
+int data: value stored in the node.
+
+Node* left: pointer to left child.
+
+Node* right: pointer to right child.
+
+Constructor initializes data and sets left and right to NULL.
+
+Constructor
+BST::BST() initializes the tree with root = NULL, indicating an empty tree.
+
+ Key Functions and Their Roles
+🔹 Node* insert(Node* root, int val)
+Inserts a new value into the BST.
+
+Recursively finds the correct position (left for smaller, right for larger).
+
+Creates a new node using new Node(val) when reaching a NULL position.
+
+🔹 Node* findMin(Node* root)
+Finds the node with the smallest value in the BST.
+
+Traverses to the leftmost node (as left children are always smaller in a BST).
+
+🔹 bool search(Node* root, int key)
+Searches for a specific value key.
+
+Returns true if found, false otherwise.
+
+Uses binary search logic:
+
+Left subtree if key is smaller than current node.
+
+Right subtree if key is larger.
+
+🔹 int height(Node* root)
+Calculates the height (depth) of the BST.
+
+Returns 0 for NULL nodes.
+
+Recursively finds height of left and right subtrees.
+
+Returns the maximum of the two + 1.
+
+🔹 void swapNodes(Node* root)
+Swaps left and right children at every node recursively.
+
+Uses swap(root->left, root->right) (inbuilt swap function).
+
+🔹 void inorder(Node* root)
+Performs inorder traversal (Left → Root → Right).
+
+Prints elements in sorted order for a BST.
+
+ User Interaction: void menu()
+Displays a menu of options to perform BST operations.
+
+Repeats using a do-while loop until user chooses to exit (option 7).
+
+🔸 Menu Options Explained:
+Insert Node: Adds a new value to BST.
+
+Display Inorder Traversal: Shows elements in ascending order.
+
+Find Minimum Value: Finds and prints the smallest value.
+
+Search for a Value: Searches a user-given value.
+
+Find Height of BST: Displays the height of the tree.
+
+Swap Nodes: Swaps all left and right children.
+
+Exit: Terminates the menu and program.
+
+ Main Function
+Creates a BST object named tree.
+
+Calls tree.menu() to start user interaction.
+
+Advantages of This Code
+Demonstrates all essential BST operations.
+
+Uses recursion effectively for insertion, searching, traversal, etc.
+
+Interactive and menu-driven for user convenience.
+
+Good example of object-oriented programming with classes and encapsulation.
