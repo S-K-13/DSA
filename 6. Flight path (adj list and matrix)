@@ -1,0 +1,264 @@
+#include <iostream>                  // Include the standard input/output stream
+#include <vector>                     // Include the vector container to store lists of data
+#include <unordered_map>              // Include unordered_map for efficient lookups
+#include <string>                     // Include string functionality to handle strings
+#include <stack>                      // Include stack for depth-first search (DFS) traversal
+using namespace std;                  // Use the standard namespace to avoid prefixing 'std::' everywhere
+
+// Struct to represent an edge in the graph
+struct Edge {
+    int destination;                 // Destination city index
+    int cost;                        // Cost of the flight to the destination
+};
+
+// Class representing a graph
+class Graph {
+private:
+    unordered_map<int, vector<Edge>> adjList; // Adjacency list to store the graph
+    void dfs(int city, vector<bool>& visited);  // DFS traversal helper function (private)
+
+public:
+    vector<string> cities;               // List of cities in the graph
+    void addCity(const string& cityName); // Function to add a city to the graph
+    void addFlight(int src, int dest, int cost); // Function to add a flight between two cities
+    bool isConnected();                   // Function to check if the graph is connected
+    void display();                       // Function to display the flight network
+};
+
+// Function to add a city to the cities vector
+void Graph::addCity(const string& cityName) {
+    cities.push_back(cityName);  // Add the city name to the cities vector
+}
+
+// Function to add a flight between two cities
+void Graph::addFlight(int src, int dest, int cost) {
+    adjList[src].push_back({dest, cost});  // Add the destination city and cost for the source city
+    adjList[dest].push_back({src, cost});  // Add the source city and cost for the destination city (undirected graph)
+}
+
+// Helper function for DFS traversal to explore the graph
+void Graph::dfs(int city, vector<bool>& visited) {
+    visited[city] = true;  // Mark the current city as visited
+    for (const Edge& edge : adjList[city]) {  // For each adjacent city (flight)
+        if (!visited[edge.destination]) {      // If the destination city hasn't been visited
+            dfs(edge.destination, visited);    // Recursively call DFS for the adjacent city
+        }
+    }
+}
+
+// Function to check if the graph is connected (all cities are reachable from any city)
+bool Graph::isConnected() {
+    if (cities.empty()) return true;  // If there are no cities, the graph is trivially connected
+    vector<bool> visited(cities.size(), false); // Create a visited vector to track visited cities
+    dfs(0, visited);  // Start DFS traversal from the first city (index 0)
+    for (bool v : visited) {  // Check if all cities were visited during DFS
+        if (!v) return false;  // If any city is unvisited, the graph is not connected
+    }
+    return true;  // All cities are visited, so the graph is connected
+}
+
+// Function to display the flight network (graph) in adjacency list format
+void Graph::display() {
+    cout << "\nFlight Network (Adjacency List Representation):\n";  // Print the header for the flight network
+    for (size_t i = 0; i < cities.size(); ++i) {  // For each city in the cities vector
+        cout << cities[i] << " -> ";  // Print the current city
+        for (const Edge& e : adjList[i]) {  // For each flight (edge) from the current city
+            cout << "(" << cities[e.destination] << ", Rs." << e.cost << ") ";  // Print the destination city and cost
+        }
+        cout << "\n";  // Print a newline after displaying the flights from a city
+    }
+}
+
+// Main function to interact with the user and run the program
+int main() {
+    Graph graph;  // Create a Graph object to manage the cities and flights
+    int choice;   // Variable to store the user's menu choice
+
+    // Menu loop for continuous user interaction until the user chooses to exit
+    do {
+        cout << "\nMenu:\n";  // Print the menu header
+        cout << "1. Add City\n";  // Option to add a new city
+        cout << "2. Add Flight\n";  // Option to add a flight between two cities
+        cout << "3. Display Flight Network\n";  // Option to display the current flight network
+        cout << "4. Check Connectivity\n";  // Option to check if all cities are connected
+        cout << "5. Exit\n";  // Option to exit the program
+        cout << "Enter your choice: ";  // Prompt the user to enter a choice
+        cin >> choice;  // Read the user's choice
+
+        // Process the user's choice using a switch-case
+        switch (choice) {
+        case 1: {  // Add a new city
+            string city;  // Variable to store the city name
+            cout << "Enter city name: ";  // Prompt for city name
+            cin >> ws;  // Discard any leading whitespace
+            getline(cin, city);  // Read the full city name (including spaces)
+            graph.addCity(city);  // Add the city to the graph
+            break;
+        }
+        case 2: {  // Add a flight between two cities
+            if (graph.cities.size() < 2) {  // Check if there are at least 2 cities to add a flight
+                cout << "Need at least 2 cities to add a flight.\n";  // Inform the user
+                break;
+            }
+            cout << "Available cities:\n";  // List the available cities
+            for (size_t i = 0; i < graph.cities.size(); ++i) {  // Loop through all cities
+                cout << i << ": " << graph.cities[i] << "\n";  // Print the index and city name
+            }
+            int src, dest, cost;  // Variables to store the source city index, destination city index, and cost
+            cout << "Enter source city index: ";  // Prompt for source city index
+            cin >> src;  // Read the source city index
+            cout << "Enter destination city index: ";  // Prompt for destination city index
+            cin >> dest;  // Read the destination city index
+            cout << "Enter flight cost: ";  // Prompt for the flight cost
+            cin >> cost;  // Read the cost
+            graph.addFlight(src, dest, cost);  // Add the flight to the graph
+            break;
+        }
+        case 3:  // Display the flight network
+            graph.display();  // Call the display function to show the flight network
+            break;
+        case 4: {  // Check if the flight network is connected
+            if (graph.isConnected()) {  // If the network is connected
+                cout << "The flight network is connected!\n";  // Inform the user
+            } else {  // If the network is not connected
+                cout << "The flight network is not connected.\n";  // Inform the user
+            }
+            break;
+        }
+        case 5:  // Exit the program
+            cout << "Exiting program.\n";  // Inform the user
+            break;
+        default:  // Handle invalid input
+            cout << "Invalid choice. Please try again.\n";  // Prompt the user to try again
+        }
+    } while (choice != 5);  // Repeat the menu loop until the user chooses to exit
+
+    return 0;  // Exit the program
+}
+cd path/to/your/file
+g++ filename.cpp -o outputname
+./outputname
+g++ hello.cpp -o hello
+./hello
+sudo apt update
+sudo apt install g++
+///////////
+Includes and Namespace:
+
+#include <iostream>: Provides input/output stream functions.
+
+#include <vector>: Allows the use of dynamic arrays (vectors).
+
+#include <unordered_map>: Provides an unordered map to store key-value pairs.
+
+#include <string>: Enables string handling.
+
+#include <stack>: Includes stack functionality (used for DFS, but not directly utilized here).
+
+using namespace std;: Avoids needing to prefix standard library functions with std::.
+
+Edge Structure:
+
+The Edge struct holds information about a flight: the destination city (destination) and the cost of the flight (cost).
+
+Graph Class:
+
+Private Members:
+
+adjList: An unordered map that stores the adjacency list, where each city (key) has a list of edges (flights).
+
+dfs(): A private recursive function for Depth-First Search (DFS), marking cities as visited.
+
+Public Members:
+
+cities: A vector storing the names of cities.
+
+addCity(): Adds a city to the cities list.
+
+addFlight(): Adds a flight (edge) between two cities with a cost.
+
+isConnected(): Checks if all cities are reachable from one city (connected graph).
+
+display(): Displays the flight network in an adjacency list format.
+
+addCity() Function:
+
+Takes a city name (cityName) and adds it to the cities vector.
+
+addFlight() Function:
+
+Adds a flight between two cities by updating the adjacency list:
+
+Adds the destination and cost to the source city’s list.
+
+Adds the source and cost to the destination city’s list (undirected graph).
+
+dfs() Function:
+
+Recursive function that explores all reachable cities from a given city (city):
+
+Marks the current city as visited.
+
+Recursively visits all unvisited neighboring cities.
+
+isConnected() Function:
+
+Checks if the graph is connected (all cities are reachable from any starting city):
+
+Initializes a visited vector to track visited cities.
+
+Performs DFS starting from the first city.
+
+If any city is unvisited after DFS, the graph is not connected.
+
+display() Function:
+
+Displays the flight network in the form of an adjacency list:
+
+For each city, it lists the destination cities along with the respective flight costs.
+
+Main Function:
+
+Menu-Driven Interface:
+
+Displays a menu allowing the user to:
+
+Add a city.
+
+Add a flight between two cities.
+
+Display the flight network.
+
+Check if the network is connected.
+
+Exit the program.
+
+Switch-Case Logic:
+
+Based on the user input (choice), different actions are performed:
+
+Add City: Prompts the user to input a city name and adds it.
+
+Add Flight: Prompts the user to select two cities, enter a cost, and add a flight.
+
+Display: Shows the current flight network.
+
+Check Connectivity: Uses isConnected() to check if all cities are reachable from any city.
+
+Exit: Terminates the program.
+
+Loop: The program keeps running until the user selects the "Exit" option.
+
+Key Concepts:
+Adjacency List: Efficient way to represent a graph, storing cities as nodes and flights as edges with costs.
+
+DFS (Depth-First Search): Traverses the graph recursively to check connectivity.
+
+Menu-Driven System: Allows users to interact with the program by selecting options.
+
+Execution Flow:
+The program waits for the user to input a menu choice.
+
+Depending on the user's input, it performs the corresponding action (adding cities, adding flights, displaying the network, or checking connectivity).
+
+The process repeats until the user exits the program.
