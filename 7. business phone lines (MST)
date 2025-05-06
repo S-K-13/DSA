@@ -1,0 +1,234 @@
+#include <iostream>       // For input/output operations.
+#include <vector>         // To use the vector container for dynamic arrays.
+#include <climits>        // To use INT_MAX, which represents the largest possible integer value.
+#include <string>         // To handle strings (city names).
+using namespace std;      // To avoid prefixing 'std::' before each standard library function.
+
+class Graph {
+    int numCities;                        // Stores the number of cities in the graph.
+    vector<string> cities;                // Stores the names of the cities.
+    vector<vector<int>> costMatrix;       // Adjacency matrix to store costs between cities.
+
+public:
+    void inputGraph();                    // Function to input the graph's data.
+    void displayMatrix();                  // Function to display the cost matrix.
+    void primMST();                        // Function to find the Minimum Spanning Tree (MST) using Prim's Algorithm.
+};
+
+void Graph::inputGraph() {
+    cout << "Enter number of cities: ";           // Prompt user to enter the number of cities.
+    cin >> numCities;                            // Read the number of cities.
+
+    cities.resize(numCities);                    // Resize the 'cities' vector to hold the city names.
+    costMatrix.resize(numCities, vector<int>(numCities));  // Resize 'costMatrix' to hold costs, initially filled with 0s.
+
+    cout << "Enter names of " << numCities << " cities:\n";  // Prompt user to enter the city names.
+    for (int i = 0; i < numCities; ++i) {         // Loop through all cities.
+        cout << "City " << i + 1 << ": ";         // Display city number.
+        cin >> cities[i];                        // Input the name of each city.
+    }
+
+    cout << "\nEnter cost to connect cities (0 if no direct connection):\n";  // Prompt for connection costs between cities.
+    for (int i = 0; i < numCities; ++i) {         // Loop through each city.
+        for (int j = 0; j < numCities; ++j) {     // Loop through every pair of cities.
+            cout << "Cost between " << cities[i] << " and " << cities[j] << ": "; // Prompt for the cost between cities.
+            cin >> costMatrix[i][j];              // Read the cost between the two cities.
+        }
+    }
+}
+
+void Graph::displayMatrix() {
+    cout << "\nCost Matrix:\n    ";  // Display the header of the matrix.
+    for (int i = 0; i < numCities; ++i)      // Loop to display city names as the header.
+        cout << cities[i] << "\t";            // Print each city name.
+    cout << endl;                            // End the header row.
+
+    for (int i = 0; i < numCities; ++i) {     // Loop to display each row in the cost matrix.
+        cout << cities[i] << " ";              // Display the city name (row label).
+        for (int j = 0; j < numCities; ++j) { // Loop to print the costs for each city pair.
+            cout << costMatrix[i][j] << "\t";  // Display the cost between the cities.
+        }
+        cout << endl;                         // End of each row in the matrix.
+    }
+}
+
+void Graph::primMST() {
+    vector<bool> selected(numCities, false);  // A vector to track if a city has been included in the MST.
+    vector<int> key(numCities, INT_MAX);      // A vector to store the minimum key (cost) for each city.
+    vector<int> parent(numCities, -1);        // A vector to store the parent city for each city in the MST.
+    int totalCost = 0;                        // Variable to accumulate the total cost of the MST.
+
+    key[0] = 0;  // Start from the first city (city 0) with key value 0.
+
+    for (int count = 0; count < numCities - 1; ++count) {  // Loop to construct the MST.
+        int minKey = INT_MAX, u = -1;  // Initialize minimum key and vertex to be selected.
+
+        for (int v = 0; v < numCities; ++v) {  // Loop through all cities.
+            if (!selected[v] && key[v] < minKey) {  // Find the city with the minimum key value that is not yet selected.
+                minKey = key[v];                      // Update the minimum key value.
+                u = v;                                // Set the city as the current city in the MST.
+            }
+        }
+
+        selected[u] = true;  // Mark the city as selected (added to the MST).
+
+        for (int v = 0; v < numCities; ++v) {  // Loop to update the key values of the neighboring cities.
+            if (costMatrix[u][v] && !selected[v] && costMatrix[u][v] < key[v]) {  // Check if the city is connected and not yet selected.
+                parent[v] = u;  // Set the parent of the city as 'u'.
+                key[v] = costMatrix[u][v];  // Update the key value for the city.
+            }
+        }
+    }
+
+    cout << "\nMinimum Spanning Tree using Prim's Algorithm:\n";  // Display the resulting MST.
+    for (int i = 1; i < numCities; ++i) {  // Loop through all cities except the first one.
+        cout << cities[parent[i]] << " - " << cities[i]  // Print the edges (connections) in the MST.
+             << " : Cost = " << costMatrix[i][parent[i]] << endl;  // Print the cost of the edge.
+        totalCost += costMatrix[i][parent[i]];  // Add the cost of the edge to the total cost.
+    }
+
+    cout << "Total Minimum Cost = " << totalCost << endl;  // Print the total minimum cost of the MST.
+}
+
+int main() {
+    Graph g;          // Create an instance of the Graph class.
+    int choice;       // Variable to store the user's choice for menu options.
+
+    do {
+        cout << "\n--- MENU ---\n";  // Display the menu.
+        cout << "1. Input Graph\n";  // Option to input the graph data.
+        cout << "2. Display Cost Matrix\n";  // Option to display the cost matrix.
+        cout << "3. Find Minimum Spanning Tree (Prim's Algorithm)\n";  // Option to find the MST.
+        cout << "4. Exit\n";  // Option to exit the program.
+        cout << "Enter your choice: ";  // Prompt for user's choice.
+        cin >> choice;  // Read user's choice.
+
+        switch (choice) {  // Switch case to handle the user's choice.
+        case 1:
+            g.inputGraph();  // Input the graph data.
+            break;
+        case 2:
+            g.displayMatrix();  // Display the cost matrix.
+            break;
+        case 3:
+            g.primMST();  // Find the Minimum Spanning Tree using Prim's algorithm.
+            break;
+        case 4:
+            cout << "Exiting program...\n";  // Exit message.
+            break;
+        default:
+            cout << "Invalid choice. Try again.\n";  // Handle invalid menu option.
+        }
+    } while (choice != 4);  // Loop until the user chooses to exit.
+
+    return 0;  // Return 0 to indicate successful program termination.
+}
+//////
+cd path/to/your/file
+g++ filename.cpp -o outputname
+./outputname
+g++ hello.cpp -o hello
+./hello
+sudo apt update
+sudo apt install g++
+/////
+Libraries and Class Declaration
+<iostream>: For input and output operations.
+
+<vector>: To use the vector container for storing cities and the cost matrix.
+
+<climits>: For accessing constants like INT_MAX, which is used to represent infinity in the graph algorithms.
+
+<string>: To handle the city names as strings.
+
+2. Graph Class
+The Graph class contains the following members:
+
+numCities: Integer to store the number of cities in the graph.
+
+cities: Vector of strings to store the names of the cities.
+
+costMatrix: 2D vector of integers to store the cost (or weight) of edges between cities.
+
+Methods of the class:
+
+inputGraph(): Takes input for the graph (cities and their connecting costs).
+
+displayMatrix(): Displays the cost matrix of the graph.
+
+primMST(): Implements Prim's Algorithm to find the Minimum Spanning Tree (MST).
+
+3. inputGraph() Method
+Input number of cities: The user is prompted to enter the number of cities in the graph.
+
+Input city names: A loop collects the names of the cities and stores them in the cities vector.
+
+Input cost matrix: Another nested loop takes the cost between every pair of cities and fills the costMatrix with these values. If there is no direct connection, the user enters 0.
+
+4. displayMatrix() Method
+Print matrix header: Prints the city names as column headers.
+
+Print cost matrix: A nested loop iterates through the costMatrix and displays the cost to travel between each pair of cities.
+
+5. primMST() Method
+Initialization:
+
+selected[]: A boolean vector to track which cities are included in the MST.
+
+key[]: Stores the minimum cost to include each city in the MST. Initially, all cities are assigned a cost of INT_MAX.
+
+parent[]: Keeps track of the parent city for each city in the MST.
+
+totalCost: Tracks the total cost of the MST.
+
+Algorithm Execution:
+
+Set the cost of the first city (key[0]) to 0, so it gets picked first.
+
+Selection of cities: In each iteration, the city with the smallest key (minimum cost) is chosen and marked as selected.
+
+Update key values: For each unselected city, update the key values if a lower-cost edge is found.
+
+Display MST: After the algorithm completes, the edges forming the MST are printed along with their cost. The total cost of the MST is also displayed.
+
+6. Main Function
+Menu Options: A menu is displayed for the user to:
+
+Input the graph.
+
+Display the cost matrix.
+
+Run Prim's algorithm to find the Minimum Spanning Tree.
+
+Exit the program.
+
+Choice Handling: A do-while loop is used to repeatedly prompt the user for an action until they choose to exit.
+
+7. Prim's Algorithm Explanation
+Initialization:
+
+All cities are unselected (selected[] is false).
+
+key[] starts with INT_MAX for all cities, except the first city (which is set to 0).
+
+parent[] keeps track of the parent city for each city in the MST.
+
+Main Process:
+
+Iteratively select the city with the minimum cost and add it to the MST.
+
+For each selected city, check if any of the neighboring cities can be added to the MST with a smaller cost and update their key[] values accordingly.
+
+Result:
+
+The edges forming the MST are printed, along with the total cost of the MST.
+
+8. Time Complexity
+Prim's Algorithm: The time complexity is O(V^2) where V is the number of cities. This is because we check each edge for every city.
+
+Summary:
+This program implements Prim's Algorithm to find the Minimum Spanning Tree (MST) for a given graph of cities and costs.
+
+The graph is represented using a cost matrix, and the user can input the graph, display the matrix, or calculate the MST.
+
+Prim's algorithm ensures that the cities are connected with the minimum possible total cost, ensuring efficiency in network design (like connecting cities with minimal cost).
