@@ -1,0 +1,317 @@
+#include <iostream>                         // Includes input-output stream for standard I/O
+using namespace std;                        // Uses standard namespace to avoid prefixing with std::
+
+class BST {                                 // Defines a class BST to represent the dictionary
+public:
+    struct Node {                           // Struct to represent each node in the BST
+        string key, meaning;                // Each node contains a key (word) and its meaning
+        Node* left;                         // Pointer to left child
+        Node* right;                        // Pointer to right child
+        Node(string k, string m);           // Constructor to initialize node with key and meaning
+    };
+    
+    BST();                                  // Constructor to initialize the BST
+    void insert(string key, string meaning); // Public function to insert a keyword and meaning
+    void inorder(Node* root);               // Function to display dictionary in ascending order
+    void descendingOrder(Node* root);       // Function to display dictionary in descending order
+    Node* search(string key);               // Function to search for a keyword and print comparisons
+    void deleteNode(string key);            // Function to delete a keyword from the BST
+    int maxComparisons(string key);         // Declared but not defined - can be used to return comparisons
+    void menu();                            // Displays the menu for user interaction
+    
+private:
+    Node* root;                             // Private root pointer of the BST
+    Node* insert(Node* root, string key, string meaning); // Recursive insert function
+    Node* search(Node* root, string key, int& comparisons); // Recursive search with comparison count
+    Node* findMin(Node* root);              // Helper to find minimum node in a subtree
+    Node* deleteNode(Node* root, string key); // Recursive delete function
+};
+
+BST::Node::Node(string k, string m) {       // Constructor definition for Node
+    key = k;                                // Initialize key
+    meaning = m;                            // Initialize meaning
+    left = right = NULL;                    // Initialize child pointers to NULL
+}
+
+BST::BST() {                                // Constructor definition for BST
+    root = NULL;                            // Initialize root as NULL
+}
+
+BST::Node* BST::insert(Node* root, string key, string meaning) { // Recursive insert
+    if (root == NULL) return new Node(key, meaning); // If tree/subtree empty, insert new node
+    if (key < root->key)                             // If key is smaller, insert into left subtree
+        root->left = insert(root->left, key, meaning);
+    else                                              // If key is larger or equal, insert into right subtree
+        root->right = insert(root->right, key, meaning);
+    return root;                                     // Return updated root
+}
+
+void BST::insert(string key, string meaning) {       // Public insert function
+    root = insert(root, key, meaning);               // Calls recursive insert starting from root
+}
+
+void BST::inorder(Node* root) {                      // Inorder traversal: left-root-right
+    if (root != NULL) {
+        inorder(root->left);                         // Visit left subtree
+        cout << root->key << " : " << root->meaning << endl; // Print key and meaning
+        inorder(root->right);                        // Visit right subtree
+    }
+}
+
+void BST::descendingOrder(Node* root) {              // Reverse inorder: right-root-left
+    if (root != NULL) {
+        descendingOrder(root->right);                // Visit right subtree
+        cout << root->key << " : " << root->meaning << endl; // Print key and meaning
+        descendingOrder(root->left);                 // Visit left subtree
+    }
+}
+
+BST::Node* BST::search(Node* root, string key, int& comparisons) { // Recursive search with counter
+    if (root == NULL || root->key == key) return root; // If not found or matched, return node
+    comparisons++;                                      // Increment comparison count
+    if (key < root->key)                                // If key is smaller, search left
+        return search(root->left, key, comparisons);
+    return search(root->right, key, comparisons);       // Else search right
+}
+
+BST::Node* BST::search(string key) {                   // Public search function
+    int comparisons = 1;                                // Initialize comparison count
+    Node* result = search(root, key, comparisons);      // Call recursive search
+    cout << "Comparisons made: " << comparisons << endl; // Print number of comparisons
+    return result;                                      // Return found node or NULL
+}
+
+BST::Node* BST::findMin(Node* root) {                  // Find minimum node (leftmost) in subtree
+    while (root->left != NULL)                          // Keep going left until NULL
+        root = root->left;
+    return root;                                       // Return the minimum node
+}
+
+BST::Node* BST::deleteNode(Node* root, string key) {   // Recursive deletion
+    if (root == NULL) return root;                      // If tree is empty, return NULL
+    if (key < root->key)                                // If key is smaller, go left
+        root->left = deleteNode(root->left, key);
+    else if (key > root->key)                           // If key is greater, go right
+        root->right = deleteNode(root->right, key);
+    else {                                              // Node with matching key found
+        if (root->left == NULL) {                       // If only right child or no child
+            Node* temp = root->right;
+            delete root;
+            return temp;
+        } else if (root->right == NULL) {               // If only left child
+            Node* temp = root->left;
+            delete root;
+            return temp;
+        }
+        Node* temp = findMin(root->right);              // If two children, find in-order successor
+        root->key = temp->key;                          // Copy successor's key
+        root->meaning = temp->meaning;                  // Copy successor's meaning
+        root->right = deleteNode(root->right, temp->key); // Delete the successor node
+    }
+    return root;                                        // Return the updated root
+}
+
+void BST::deleteNode(string key) {                     // Public delete function
+    root = deleteNode(root, key);                      // Calls recursive delete starting from root
+}
+
+void BST::menu() {                                     // Menu function for user interaction
+    int choice;                                        // Stores user menu choice
+    string key, meaning;                               // Variables to take keyword and meaning
+    do {
+        cout << "\nDictionary using BST:\n";           // Display menu
+        cout << "1. Insert keyword\n";
+        cout << "2. Display in ascending order\n";
+        cout << "3. Display in descending order\n";
+        cout << "4. Search for a keyword\n";
+        cout << "5. Delete a keyword\n";
+        cout << "6. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;                                 // Take user choice
+        cin.ignore();                                  // Ignore newline left by cin
+        
+        switch (choice) {
+            case 1:
+                cout << "Enter keyword: ";             // Insert option
+                getline(cin, key);                     // Input keyword
+                cout << "Enter meaning: ";             // Input meaning
+                getline(cin, meaning);
+                insert(key, meaning);                  // Call insert
+                break;
+            case 2:
+                cout << "Dictionary in ascending order:\n";
+                inorder(root);                         // Display ascending order
+                break;
+            case 3:
+                cout << "Dictionary in descending order:\n";
+                descendingOrder(root);                 // Display descending order
+                break;
+            case 4:
+                cout << "Enter keyword to search: ";
+                getline(cin, key);                     // Input keyword to search
+                if (search(key))                       // Call search
+                    cout << "Keyword found!\n";        // If found
+                else
+                    cout << "Keyword not found!\n";    // If not found
+                break;
+            case 5:
+                cout << "Enter keyword to delete: ";
+                getline(cin, key);                     // Input keyword to delete
+                deleteNode(key);                       // Call delete
+                cout << "Keyword deleted.\n";
+                break;
+            case 6:
+                cout << "Exiting...\n";                // Exit message
+                break;
+            default:
+                cout << "Invalid choice!\n";           // Invalid option handler
+        }
+    } while (choice != 6);                             // Loop until choice is 6 (exit)
+}
+
+int main() {
+    BST dictionary;                                    // Create a BST object for dictionary
+    dictionary.menu();                                 // Call the menu for user interaction
+    return 0;                                          // Exit the program
+}
+
+
+cd path/to/your/file
+g++ filename.cpp -o outputname
+./outputname
+g++ hello.cpp -o hello
+./hello
+sudo apt update
+sudo apt install g++
+//////
+
+Header Files and Namespace:
+
+#include <iostream>: Includes the standard input/output stream to allow the use of cin, cout, etc.
+
+using namespace std;: Allows us to use standard library functions and objects without prefixing std::.
+
+BST Class Definition:
+
+A class BST is defined to represent a Binary Search Tree (BST), which is used to store a dictionary with keywords and their meanings.
+
+Node Structure:
+
+The Node struct represents a single node in the BST.
+
+Each Node contains:
+
+string key: the keyword (word) in the dictionary.
+
+string meaning: the meaning of the keyword.
+
+Node* left: pointer to the left child node.
+
+Node* right: pointer to the right child node.
+
+The constructor Node(string k, string m) initializes the key, meaning, and sets left and right to NULL.
+
+Public Member Functions:
+
+Constructor BST(): Initializes the root pointer to NULL, indicating that the tree is initially empty.
+
+insert: Adds a new keyword and meaning to the BST by calling a private insert function recursively.
+
+inorder: Performs an inorder traversal of the BST, printing the dictionary in ascending order of keywords.
+
+descendingOrder: Performs a reverse inorder traversal of the BST to print the dictionary in descending order of keywords.
+
+search: Searches for a keyword in the BST and prints the number of comparisons made during the search.
+
+deleteNode: Deletes a node from the BST based on the provided keyword.
+
+menu: Displays a menu for user interaction, allowing the user to insert, display, search, delete, or exit.
+
+Private Member Functions:
+
+*insert(Node root, string key, string meaning)**: A recursive function that inserts a node in the correct position based on the BST property (left child < parent < right child).
+
+*search(Node root, string key, int& comparisons)**: A recursive function that searches for a keyword in the BST, updating the number of comparisons made.
+
+*findMin(Node root)**: Finds and returns the node with the minimum key in the given subtree (leftmost node).
+
+*deleteNode(Node root, string key)**: A recursive function that deletes a node with the given key, handling three cases:
+
+Node with no children.
+
+Node with one child.
+
+Node with two children, where the in-order successor is used to replace the node.
+
+Insert Function:
+
+The insert function is called with the root of the tree and the keyword and meaning.
+
+If the root is NULL, a new node is created and returned.
+
+If the keyword is smaller than the root’s key, the function recursively inserts the new node into the left subtree.
+
+If the keyword is greater than or equal to the root’s key, the function recursively inserts the new node into the right subtree.
+
+Inorder Traversal:
+
+The inorder function recursively traverses the left subtree, prints the current node’s key and meaning, and then traverses the right subtree.
+
+This results in printing the dictionary in ascending order based on the keyword.
+
+Descending Order Traversal:
+
+The descendingOrder function works similarly to inorder, but it first traverses the right subtree and then the left subtree, printing the dictionary in descending order of keywords.
+
+Search Function:
+
+The search function initiates a search for the given keyword.
+
+It calls the recursive search function, which checks whether the root is NULL or the keyword matches the root's key.
+
+If not, it increments the comparison count and recursively searches either the left or right subtree based on whether the keyword is smaller or larger than the current node’s key.
+
+The number of comparisons made is printed when the search is complete.
+
+Delete Function:
+
+The deleteNode function recursively searches for the node with the specified key and handles three cases:
+
+If the node has no left or right child (leaf node), it is deleted and returns NULL.
+
+If the node has one child, the child replaces the node.
+
+If the node has two children, the in-order successor (leftmost node in the right subtree) is found, its key and meaning are copied to the current node, and the successor is deleted.
+
+Menu Function:
+
+The menu function continuously displays a menu to the user with options to insert, display in ascending order, display in descending order, search for a keyword, delete a keyword, or exit.
+
+Based on the user’s choice, the respective operation is performed.
+
+For insertion, it prompts the user to enter a keyword and meaning, and calls the insert function.
+
+For display, it calls inorder or descendingOrder based on the user’s choice.
+
+For search, it calls the search function and prints whether the keyword was found or not.
+
+For deletion, it prompts for the keyword and calls deleteNode to remove it from the tree.
+
+If the user chooses to exit, the program exits the loop and terminates.
+
+Main Function:
+
+The main function creates an instance of the BST class called dictionary.
+
+It then calls the menu function to interact with the user.
+
+Key Points to Remember:
+Binary Search Tree (BST): A tree where each node has at most two children, and the left child is smaller than the parent while the right child is larger.
+
+Recursive Operations: Most of the functions (insert, search, delete) work recursively, leveraging the BST properties to maintain structure.
+
+Inorder Traversal: Used to print the dictionary in ascending order.
+
+Descending Order Traversal: Used to print the dictionary in descending order.
+
+Dynamic User Interaction: The program lets the user insert, search, delete, and display elements interactively using a menu system.
