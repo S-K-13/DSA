@@ -1,0 +1,322 @@
+//cpp 
+
+#include <iostream>      // Includes input-output stream for cin and cout
+#include <set>           // Includes STL set container
+using namespace std;     // Uses standard namespace to avoid std:: prefix
+
+// Custom Set class using STL set<int> as internal data storage
+class Set {
+private:
+    set<int> s;  // Private STL set to store unique integers
+
+public:
+    // Member function declarations
+    void addElement(int element);             // Adds element to the set
+    void removeElement(int element);          // Removes element from the set
+    bool contains(int element);               // Checks if element exists in the set
+    int size();                               // Returns number of elements in the set
+    void display();                           // Displays elements of the set
+    Set unionSet(Set &other);                 // Returns union of current set and another set
+    Set intersectionSet(Set &other);          // Returns intersection of current set and another set
+    Set differenceSet(Set &other);            // Returns difference of current set and another set
+    bool isSubset(Set &other);                // Checks if current set is a subset of another set
+};
+
+// Adds element to the set using STL insert
+void Set::addElement(int element) {
+    s.insert(element);  // Inserting element (no duplicates allowed)
+}
+
+// Removes element from the set using STL erase
+void Set::removeElement(int element) {
+    s.erase(element);   // Removes element if present, does nothing if not found
+}
+
+// Checks if an element exists in the set
+bool Set::contains(int element) {
+    return s.find(element) != s.end();  // Returns true if found, false otherwise
+}
+
+// Returns the number of elements in the set
+int Set::size() {
+    return s.size();    // Uses STL size function
+}
+
+// Displays all elements of the set
+void Set::display() {
+    cout << "Set elements: { ";
+    for (int ele : s) {       // Range-based for loop to print elements
+        cout << ele << " ";
+    }
+    cout << "}\n";
+}
+
+// Returns union of current set and another set
+Set Set::unionSet(Set &other) {
+    Set result;                       // Create a result set
+    result.s = s;                     // Copy current set to result
+    result.s.insert(other.s.begin(), other.s.end());  // Insert elements from other set
+    return result;                    // Return the union result
+}
+
+// Returns intersection of current set and another set
+Set Set::intersectionSet(Set &other) {
+    Set result;
+    for (int ele : s) {              // Check each element in current set
+        if (other.s.find(ele) != other.s.end()) {
+            result.s.insert(ele);    // Insert common elements into result set
+        }
+    }
+    return result;
+}
+
+// Returns difference of current set and another set (elements only in current set)
+Set Set::differenceSet(Set &other) {
+    Set result;
+    for (int ele : s) {
+        if (other.s.find(ele) == other.s.end()) {
+            result.s.insert(ele);    // Insert elements not in other set
+        }
+    }
+    return result;
+}
+
+// Checks if current set is a subset of another set
+bool Set::isSubset(Set &other) {
+    for (int ele : s) {
+        if (other.s.find(ele) == other.s.end()) {
+            return false;            // Return false if any element is missing in other set
+        }
+    }
+    return true;                     // Return true if all elements are found in other set
+}
+
+// Main function to drive the menu-driven set operations
+int main() {
+    Set set1, set2, resultSet;   // Create two main sets and one result set
+    int choice, element;         // Variables for user choice and element input
+
+    while (true) {               // Infinite loop for menu-driven interaction
+        cout << "\nMenu:\n";
+        cout << "1. Add element to Set 1\n";
+        cout << "2. Add element to Set 2\n";
+        cout << "3. Remove element from Set 1\n";
+        cout << "4. Remove element from Set 2\n";
+        cout << "5. Display Sets\n";
+        cout << "6. Union\n";
+        cout << "7. Intersection\n";
+        cout << "8. Difference (Set1 - Set2)\n";
+        cout << "9. Check if Set1 is a subset of Set2\n";
+        cout << "10. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;   // Take menu choice input
+
+        switch (choice) {
+            case 1:
+                cout << "Enter element to add in Set 1: ";
+                cin >> element;
+                set1.addElement(element);  // Add element to Set 1
+                break;
+            case 2:
+                cout << "Enter element to add in Set 2: ";
+                cin >> element;
+                set2.addElement(element);  // Add element to Set 2
+                break;
+            case 3:
+                cout << "Enter element to remove from Set 1: ";
+                cin >> element;
+                set1.removeElement(element);  // Remove element from Set 1
+                break;
+            case 4:
+                cout << "Enter element to remove from Set 2: ";
+                cin >> element;
+                set2.removeElement(element);  // Remove element from Set 2
+                break;
+            case 5:
+                cout << "Set 1: ";
+                set1.display();  // Display Set 1
+                cout << "Set 2: ";
+                set2.display();  // Display Set 2
+                break;
+            case 6:
+                resultSet = set1.unionSet(set2);  // Perform union
+                cout << "Union: ";
+                resultSet.display();
+                break;
+            case 7:
+                resultSet = set1.intersectionSet(set2);  // Perform intersection
+                cout << "Intersection: ";
+                resultSet.display();
+                break;
+            case 8:
+                resultSet = set1.differenceSet(set2);  // Perform difference Set1 - Set2
+                cout << "Difference (Set1 - Set2): ";
+                resultSet.display();
+                break;
+            case 9:
+                if (set1.isSubset(set2)) {  // Check if Set1 is a subset of Set2
+                    cout << "Set1 is a subset of Set2\n";
+                } else {
+                    cout << "Set1 is NOT a subset of Set2\n";
+                }
+                break;
+            case 10:
+                return 0;  // Exit the program
+            default:
+                cout << "Invalid choice! Try again.\n";  // For any wrong input
+        }
+    }
+}
+
+
+cd path/to/your/file
+g++ filename.cpp -o outputname
+./outputname
+g++ hello.cpp -o hello
+./hello
+sudo apt update
+sudo apt install g++
+
+///////////////////
+
+
+python
+
+# Define a Set class to mimic set operations with custom methods
+class Set:
+    def __init__(self):
+        # Use Python's built-in set data structure to store elements
+        self.s = set()
+
+    def add_element(self, element):
+        # Add an element to the set
+        self.s.add(element)
+
+    def remove_element(self, element):
+        # Remove an element from the set, if it exists
+        self.s.discard(element)  # discard doesn't raise error if element not present
+
+    def contains(self, element):
+        # Check if the element exists in the set
+        return element in self.s
+
+    def size(self):
+        # Return the number of elements in the set
+        return len(self.s)
+
+    def display(self):
+        # Display all elements in the set
+        print(f"Set elements: {{ {', '.join(map(str, sorted(self.s)))} }}")
+
+    def union_set(self, other):
+        # Return the union of two sets
+        result = Set()
+        result.s = self.s.union(other.s)
+        return result
+
+    def intersection_set(self, other):
+        # Return the intersection of two sets
+        result = Set()
+        result.s = self.s.intersection(other.s)
+        return result
+
+    def difference_set(self, other):
+        # Return the difference of two sets (elements in self but not in other)
+        result = Set()
+        result.s = self.s.difference(other.s)
+        return result
+
+    def is_subset(self, other):
+        # Check if current set is a subset of another set
+        return self.s.issubset(other.s)
+
+
+# Main program starts here
+if __name__ == "__main__":
+    set1 = Set()  # Create Set 1
+    set2 = Set()  # Create Set 2
+
+    while True:
+        # Display menu options
+        print("\nMenu:")
+        print("1. Add element to Set 1")
+        print("2. Add element to Set 2")
+        print("3. Remove element from Set 1")
+        print("4. Remove element from Set 2")
+        print("5. Display Sets")
+        print("6. Union")
+        print("7. Intersection")
+        print("8. Difference (Set1 - Set2)")
+        print("9. Check if Set1 is a subset of Set2")
+        print("10. Exit")
+
+        # Take user's choice
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            # Add element to Set 1
+            element = int(input("Enter element to add in Set 1: "))
+            set1.add_element(element)
+
+        elif choice == '2':
+            # Add element to Set 2
+            element = int(input("Enter element to add in Set 2: "))
+            set2.add_element(element)
+
+        elif choice == '3':
+            # Remove element from Set 1
+            element = int(input("Enter element to remove from Set 1: "))
+            set1.remove_element(element)
+
+        elif choice == '4':
+            # Remove element from Set 2
+            element = int(input("Enter element to remove from Set 2: "))
+            set2.remove_element(element)
+
+        elif choice == '5':
+            # Display both sets
+            print("Set 1: ", end="")
+            set1.display()
+            print("Set 2: ", end="")
+            set2.display()
+
+        elif choice == '6':
+            # Perform union and display result
+            result = set1.union_set(set2)
+            print("Union: ", end="")
+            result.display()
+
+        elif choice == '7':
+            # Perform intersection and display result
+            result = set1.intersection_set(set2)
+            print("Intersection: ", end="")
+            result.display()
+
+        elif choice == '8':
+            # Perform difference (Set1 - Set2) and display result
+            result = set1.difference_set(set2)
+            print("Difference (Set1 - Set2): ", end="")
+            result.display()
+
+        elif choice == '9':
+            # Check if Set1 is a subset of Set2
+            if set1.is_subset(set2):
+                print("Set1 is a subset of Set2")
+            else:
+                print("Set1 is NOT a subset of Set2")
+
+        elif choice == '10':
+            # Exit the program
+            print("Exiting program...")
+            break
+
+        else:
+            # Invalid input
+            print("Invalid choice! Please try again.")
+
+
+cd path/to/your/file
+python3 filename.py
+
+sudo apt update
+sudo apt install python3
