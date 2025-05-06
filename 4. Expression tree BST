@@ -1,0 +1,245 @@
+#include <iostream>  // for input-output operations
+#include <stack>     // for using stack STL
+using namespace std;
+
+// Define the ExpressionTree class
+class ExpressionTree {
+public:
+    // Structure to represent a tree node
+    struct TreeNode {
+        char data;             // character (operand/operator)
+        TreeNode* left;        // pointer to left child
+        TreeNode* right;       // pointer to right child
+        TreeNode(char val);    // constructor to initialize the node
+    };
+
+    TreeNode* constructTree(string prefix);         // function to construct tree from prefix
+    void postOrderTraversal(TreeNode* root);        // function to display postorder traversal
+    void deleteTree(TreeNode* root);                // function to delete tree
+    bool isOperator(char c);                        // check if a character is an operator
+};
+
+// Constructor for TreeNode
+ExpressionTree::TreeNode::TreeNode(char val) {
+    data = val;              // assign character
+    left = right = nullptr;  // initialize children as null
+}
+
+// Function to check if character is operator
+bool ExpressionTree::isOperator(char c) {
+    return (c == '+' || c == '-' || c == '*' || c == '/'); // returns true if c is an operator
+}
+
+// Function to construct expression tree from prefix expression
+ExpressionTree::TreeNode* ExpressionTree::constructTree(string prefix) {
+    stack<TreeNode*> st;  // create a stack to hold tree nodes
+    for (int i = prefix.length() - 1; i >= 0; i--) {  // traverse prefix from right to left
+        TreeNode* node = new TreeNode(prefix[i]);    // create new node
+        if (isOperator(prefix[i])) {                 // if character is operator
+            node->left = st.top(); st.pop();         // pop two operands and assign
+            node->right = st.top(); st.pop();        // as left and right children
+        }
+        st.push(node);                               // push node back to stack
+    }
+    return st.top();  // final node in stack is the root
+}
+
+// Function for non-recursive postorder traversal
+void ExpressionTree::postOrderTraversal(TreeNode* root) {
+    if (!root) {  // check if tree is empty
+        cout << "Tree is empty.\n";
+        return;
+    }
+
+    stack<TreeNode*> s1, s2;   // create two stacks
+    s1.push(root);             // push root to first stack
+    while (!s1.empty()) {      // iterate while first stack is not empty
+        TreeNode* node = s1.top(); s1.pop();  // pop node
+        s2.push(node);                        // push to second stack
+        if (node->left) s1.push(node->left);  // push left child
+        if (node->right) s1.push(node->right); // push right child
+    }
+
+    cout << "Postorder Traversal: ";
+    while (!s2.empty()) {              // now print from second stack
+        cout << s2.top()->data << " "; // this is postorder sequence
+        s2.pop();
+    }
+    cout << endl;
+}
+
+// Function to delete entire tree using stack
+void ExpressionTree::deleteTree(TreeNode* root) {
+    if (!root) return;  // if tree is empty, nothing to delete
+    stack<TreeNode*> st;  // create a stack
+    st.push(root);        // push root
+    while (!st.empty()) {
+        TreeNode* node = st.top(); st.pop();  // pop top node
+        if (node->left) st.push(node->left);  // push left child if exists
+        if (node->right) st.push(node->right); // push right child if exists
+        delete node;  // delete the node
+    }
+}
+
+// Main function with menu
+int main() {
+    ExpressionTree et;                       // object of ExpressionTree
+    ExpressionTree::TreeNode* root = nullptr; // initialize root pointer
+    string prefix = "";                      // initialize prefix string
+    int choice;                              // variable to store user choice
+
+    do {
+        // Menu options
+        cout << "\n====== Expression Tree Menu ======\n";
+        cout << "1. Enter Prefix Expression\n";
+        cout << "2. Construct Expression Tree\n";
+        cout << "3. Postorder Traversal (Non-Recursive)\n";
+        cout << "4. Delete Expression Tree\n";
+        cout << "5. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            cout << "Enter prefix expression: ";
+            cin >> prefix;  // take input from user
+            break;
+
+        case 2:
+            if (prefix.empty()) {  // check if prefix is entered
+                cout << "Please enter a prefix expression first (Option 1).\n";
+            } else {
+                root = et.constructTree(prefix);  // construct tree
+                cout << "Expression tree constructed.\n";
+            }
+            break;
+
+        case 3:
+            et.postOrderTraversal(root);  // perform postorder traversal
+            break;
+
+        case 4:
+            et.deleteTree(root);          // delete tree
+            root = nullptr;               // reset root to null
+            cout << "Expression tree deleted.\n";
+            break;
+
+        case 5:
+            et.deleteTree(root);          // delete tree before exiting
+            cout << "Exiting program.\n";
+            break;
+
+        default:
+            cout << "Invalid choice. Please select again.\n";  // handle invalid input
+        }
+    } while (choice != 5);  // repeat menu until user chooses to exit
+
+    return 0;  // end of program
+}
+cd path/to/your/file
+g++ filename.cpp -o outputname
+./outputname
+g++ hello.cpp -o hello
+./hello
+sudo apt update
+sudo apt install g++
+
+
+1. Header Files and Namespace
+#include <iostream>: Used for standard input and output operations.
+
+#include <stack>: Used to utilize the stack data structure from the Standard Template Library (STL).
+
+using namespace std;: Allows usage of standard names like cout, cin, string, etc., without the std:: prefix.
+
+2. Class Definition: ExpressionTree
+A class ExpressionTree is defined to represent and operate on an expression tree built from a prefix expression.
+
+2.1. Nested Struct: TreeNode
+Struct TreeNode represents each node in the expression tree.
+
+It contains:
+
+char data: Holds a character, which could be an operator or operand.
+
+TreeNode* left and TreeNode* right: Pointers to the left and right child nodes.
+
+Constructor TreeNode(char val) initializes the node with the given character and sets both child pointers to nullptr.
+
+2.2. Member Functions
+TreeNode* constructTree(string prefix): Constructs the expression tree from a given prefix expression.
+
+void postOrderTraversal(TreeNode* root): Displays the non-recursive postorder traversal of the tree.
+
+void deleteTree(TreeNode* root): Deletes all the nodes of the tree and frees the memory.
+
+bool isOperator(char c): Checks whether a given character is a valid arithmetic operator (+, -, *, /).
+
+3. Tree Construction: constructTree()
+Uses a stack to construct the tree from right to left of the prefix string.
+
+For each character in the prefix string:
+
+A node is created.
+
+If the character is an operator:
+
+Two nodes are popped from the stack and set as the left and right children.
+
+The new node is then pushed back onto the stack.
+
+After the loop, the top of the stack contains the root of the expression tree.
+
+4. Non-Recursive Postorder Traversal: postOrderTraversal()
+Checks if the tree is empty. If yes, it prints a message.
+
+Uses two stacks (s1 and s2):
+
+Pushes the root onto s1.
+
+In each iteration:
+
+Pops a node from s1, pushes it to s2.
+
+Pushes its left and right children onto s1.
+
+After s1 is empty, nodes are popped from s2 and printed, producing a postorder traversal.
+
+5. Tree Deletion: deleteTree()
+Deletes all nodes using a stack-based (non-recursive) approach:
+
+Uses a stack to traverse the tree in depth-first manner.
+
+Pops each node and pushes its children if they exist.
+
+Deletes each popped node to free memory.
+
+6. Main Function
+Creates an object of ExpressionTree.
+
+Initializes:
+
+A pointer root to store the root of the tree.
+
+A prefix string to take user input.
+
+A choice variable to navigate the menu.
+
+Provides a menu-driven interface using a do-while loop:
+
+Enter Prefix Expression: Takes input from the user.
+
+Construct Expression Tree: Calls constructTree() using the entered prefix expression.
+
+Postorder Traversal: Calls postOrderTraversal() to display postorder form.
+
+Delete Expression Tree: Calls deleteTree() and resets root to nullptr.
+
+Exit: Deletes tree if present and exits the program.
+
+7. Program Characteristics
+Allows multiple operations via menu without restarting the program.
+
+Uses non-recursive methods for both traversal and deletion.
+
+Effectively demonstrates stack-based tree construction from prefix notation.
