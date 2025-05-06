@@ -1,0 +1,186 @@
+//cpp code
+
+#include <iostream>                // For input and output operations
+#include <vector>                  // To use the vector container from the Standard Template Library
+using namespace std;               // Allows usage of standard library members without 'std::' prefix
+
+class HashTable {
+    int size;                      // Stores the size of the hash table
+    vector<int> table;             // Vector used as the hash table, initialized with -1 (empty)
+
+public:
+    HashTable(int s);              // Constructor declaration
+    void linear_probe(int key);    // Function to insert key using linear probing
+    void quadratic_probe(int key); // Function to insert key using quadratic probing
+    void display();                // Function to display the hash table
+    void menu();                   // Function to display and handle menu-driven interface
+};
+
+HashTable::HashTable(int s) : size(s), table(s, -1) {}  // Constructor initializes size and fills table with -1
+
+void HashTable::linear_probe(int key) {
+    int index = key % size;                        // Calculate initial index using modulo
+    while (table[index] != -1) {                   // Loop until an empty slot is found
+        index = (index + 1) % size;                // Move linearly to the next slot (wrap around using modulo)
+    }
+    table[index] = key;                            // Insert the key at the found index
+    cout << key << " inserted at index " << index << endl;  // Print insertion info
+}
+
+void HashTable::quadratic_probe(int key) {
+    int index = key % size, i = 1;                 // Calculate initial index and initialize step counter
+    while (table[index] != -1) {                   // Loop until an empty slot is found
+        index = (key + i * i) % size;              // Apply quadratic probing formula
+        i++;                                       // Increment the step
+    }
+    table[index] = key;                            // Insert the key at the found index
+    cout << key << " inserted at index " << index << endl;  // Print insertion info
+}
+
+void HashTable::display() {
+    cout << "Hash Table: ";                        // Print label
+    for (int val : table) {                        // Loop through the hash table
+        cout << val << " ";                        // Print each value
+    }
+    cout << endl;                                  // New line after displaying all values
+}
+
+void HashTable::menu() {
+    int choice;                                    // Variable to store user choice
+    do {
+        cout << "\nMenu:\n";                       // Display menu options
+        cout << "1. Insert using Linear Probing\n";
+        cout << "2. Insert using Quadratic Probing\n";
+        cout << "3. Display Hash Table\n";
+        cout << "4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;                             // Take user input for menu choice
+
+        if (choice == 1 || choice == 2) {          // If insertion is selected
+            cout << "Enter the keys separated by space (end input with newline): ";
+            vector<int> keys;                      // Vector to store input keys
+            int key;
+            while (cin >> key) {                   // Read multiple keys from user
+                keys.push_back(key);               // Add each key to the vector
+                if (cin.peek() == '\n') break;     // Stop when newline is encountered
+            }
+            if (choice == 1) {
+                cout << "Using Linear Probing:" << endl;
+                for (int key : keys) {             // Insert each key using linear probing
+                    linear_probe(key);
+                }
+            } else {
+                cout << "Using Quadratic Probing:" << endl;
+                for (int key : keys) {             // Insert each key using quadratic probing
+                    quadratic_probe(key);
+                }
+            }
+        } else if (choice == 3) {
+            display();                             // Display the hash table
+        } else if (choice != 4) {
+            cout << "Invalid choice. Try again." << endl;  // Handle invalid input
+        }
+    } while (choice != 4);                         // Repeat menu until exit is selected
+    cout << "Exiting..." << endl;                  // Display exit message
+}
+
+int main() {
+    int size;
+    cout << "Enter the size of the hash table: ";  // Ask user for table size
+    cin >> size;                                   // Read the size
+    HashTable hashTable(size);                     // Create hash table object
+    hashTable.menu();                              // Start menu interface
+    return 0;                                       // End of main function
+}
+
+//////////////////////////
+
+cd path/to/your/file
+g++ filename.cpp -o outputname
+./outputname
+g++ hello.cpp -o hello
+./hello
+sudo apt update
+sudo apt install g++
+
+
+
+
+// python 
+
+
+class HashTable:
+    def __init__(self, size):                            # Constructor to initialize hash table
+        self.size = size                                 # Store the size of the hash table
+        self.table = [-1] * size                         # Initialize hash table with -1 (indicates empty slot)
+
+    def linear_probe(self, key):                         # Insert a key using linear probing
+        index = key % self.size                          # Compute initial index using modulo
+        start_index = index                              # Keep track of the starting index to detect full loop
+        while self.table[index] != -1:                   # Loop until an empty slot is found
+            index = (index + 1) % self.size              # Move to next index (circular increment)
+            if index == start_index:                     # If we looped back to start, table is full
+                print("Hash Table is full!")             
+                return
+        self.table[index] = key                          # Insert the key at the found empty index
+        print(f"{key} inserted at index {index}")        # Display the index where key was inserted
+
+    def quadratic_probe(self, key):                      # Insert a key using quadratic probing
+        index = key % self.size                          # Compute initial index
+        i = 1                                             # Step counter for quadratic formula
+        start_index = index                              # Save starting point to detect full loop
+        while self.table[index] != -1:                   # Continue if slot is occupied
+            index = (key + i * i) % self.size            # Apply quadratic probing formula
+            i += 1                                       # Increase step
+            if i == self.size:                           # If no empty slot found after full loop
+                print("Hash Table is full!")             
+                return
+        self.table[index] = key                          # Insert key
+        print(f"{key} inserted at index {index}")        # Show insertion message
+
+    def display(self):                                   # Display current hash table
+        print("Hash Table:", self.table)                 # Print the table as a list
+
+    def menu(self):                                      # Menu function to interact with user
+        while True:                                      # Loop until user exits
+            print("\nMenu:")                             # Print menu options
+            print("1. Insert using Linear Probing")
+            print("2. Insert using Quadratic Probing")
+            print("3. Display Hash Table")
+            print("4. Exit")
+            choice = input("Enter your choice: ")        # Take user input for menu selection
+
+            if choice in ['1', '2']:                     # If user selects insertion
+                keys_input = input("Enter the keys separated by space: ")  # Prompt for keys
+                keys = list(map(int, keys_input.strip().split()))          # Convert input string to list of integers
+                if choice == '1':                        # Linear probing selected
+                    print("Using Linear Probing:")
+                    for key in keys:                     # Insert each key
+                        self.linear_probe(key)
+                else:                                    # Quadratic probing selected
+                    print("Using Quadratic Probing:")
+                    for key in keys:
+                        self.quadratic_probe(key)
+            elif choice == '3':                          # Display table
+                self.display()
+            elif choice == '4':                          # Exit program
+                print("Exiting...")
+                break
+            else:                                        # Invalid input handling
+                print("Invalid choice. Try again.")
+
+# Main program execution starts here
+if __name__ == "__main__":                               # Ensures this runs only if script is run directly
+    size = int(input("Enter the size of the hash table: "))  # Prompt user for table size
+    ht = HashTable(size)                                 # Create HashTable object
+    ht.menu()                                             # Start menu-driven interaction
+   
+
+////////////////////////////////////////////////
+
+cd path/to/your/file
+python3 filename.py
+
+sudo apt update
+sudo apt install python3
+
